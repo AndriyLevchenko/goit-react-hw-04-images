@@ -8,10 +8,6 @@ export class Searchbar extends React.Component {
         searchQueryInput: '',
     };
 
-    handleNameChange = event => {
-        this.setState({ searchQueryInput: event.currentTarget.value.toLowerCase() });
-    };
-
     handleSubmit = event => {
         event.preventDefault();
         if (this.state.searchQueryInput.trim() === '') {
@@ -19,6 +15,10 @@ export class Searchbar extends React.Component {
         }
         this.props.onSubmit(this.state.searchQueryInput);
         this.setState({ searchQueryInput: '' });
+    };
+
+    handleNameChange = event => {
+        this.setState({ searchQueryInput: event.currentTarget.value.toLowerCase() });
     };
 
     render() {
@@ -31,7 +31,7 @@ export class Searchbar extends React.Component {
 
                 <input
                     onChange={this.handleNameChange}
-                    value={this.searchQueryInput}
+                    value={this.state.searchQueryInput}
                     className="input"
                     type="text"
                     autoComplete="off"
