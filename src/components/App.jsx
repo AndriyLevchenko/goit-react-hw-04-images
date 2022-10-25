@@ -1,41 +1,55 @@
 import React from 'react';
-import axios from 'axios';
 import { Searchbar } from './Searchbar/Searchbar';
 import { ImageGallery } from './ImageGallery/ImageGallery';
-// import PropTypes from 'prop-types';
-
-const API_KEY = `29781488-c1f8f32b8cf0d06ff300c84b0`;
-const OPTIONS = `image_type=photo&orientation=horizontal&safesearch=true&lang=en&lang=uk&per_page=12`;
+import { fetchPixabay } from './Pixabay/fetchPixabay';
+import { Button } from './Button/Button';
+// import css from 'components/App.module.css';
 
 export class App extends React.Component {
   state = {
     page: 1,
-    totalPage: null,
+    totalPage: 1,
     searchQueryInput: '',
     hits: [],
     status: 'idle',
   }
-  componentDidMount = (prevProps, prevState) => {
+  componentDidUpdate = (prevProps, prevState) => {
     const { searchQueryInput, page } = this.state;
-    axios.get(`https://pixabay.com/api/?key=${API_KEY}&q=${searchQueryInput}&${OPTIONS}&page=${page}`)
-    .then(res => {
-      const hits = res.data;
-      this.setState({ hits });
-      console.log(hits)
+    if (prevState.searchQueryInput !== searchQueryInput || prevState.page !== page) {
+      this.setState({ status: 'pending' });
+    
+      fetchPixabay(searchQueryInput, page)
+      .then(res => {
+      const currentHits = res.data.hits.map(({ id, webformatURL, largeImageURL, tags }) => {
+        return { id, webformatURL, largeImageURL, tags};
+      });
+      this.setState(prevState => ({
+        hits: [...prevState.hits, ...currentHits],
+        status: 'resolved',
+        totalPages: Math.ceil(res.data.totalHits / 12),
+      }));
     })
-  }
+    .catch(error => {
+      this.setState({ status: 'rejected' });
+    });
+  }}
 
-  handleFormSubmit = searchQueryInput => {
-    this.setState({ searchQueryInput });
+  handleFormSubmit = query => {
+    this.setState({ searchQueryInput: query, page: 1, hits: [] });
   };
 
+  loadMore = () => {
+    this.setState(state => ({ page: state.page + 1 }));
+  };
 
   render() {
+    const {status, hits, page, totalPages} = this.state;
     return (
-
       <div>
         <Searchbar onSubmit={this.handleFormSubmit}/>
-        <ImageGallery images={this.state.hits}/>
+        {hits.length > 0 && <ImageGallery images={hits}/>}
+        {hits.length > 0 && status === 'resolved' && page !== totalPages && (
+        <Button onClick={this.loadMore} />)}
       </div>
     )
   }

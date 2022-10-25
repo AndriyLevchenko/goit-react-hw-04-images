@@ -1,6 +1,7 @@
 import React from 'react';
 import {ImSearch} from 'react-icons/im'
 import { Notify } from 'notiflix/build/notiflix-notify-aio';
+import css from 'components/Searchbar/Searchbar.module.css'
 import PropTypes from 'prop-types';
 
 export class Searchbar extends React.Component {
@@ -23,16 +24,16 @@ export class Searchbar extends React.Component {
 
     render() {
         return (
-            <header className="searchbar">
-            <form className="form" onSubmit={this.handleSubmit}>
-                <button type="submit" className="button">
-                <ImSearch className="button-label" />
+            <header className={css.Searchbar}>
+            <form className={css.SearchForm} onSubmit={this.handleSubmit}>
+                <button type="submit" className={css.SearchFormButton}>
+                <ImSearch />
                 </button>
 
                 <input
                     onChange={this.handleNameChange}
                     value={this.state.searchQueryInput}
-                    className="input"
+                    className={css.SearchFormInput}
                     type="text"
                     autoComplete="off"
                     autoFocus
