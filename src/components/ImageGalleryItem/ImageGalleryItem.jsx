@@ -15,7 +15,7 @@ export class ImageGalleryItem extends React.Component {
   render () {
     const { webformatURL, tags, largeImageURL } = this.props;
     return (
-      <div>
+      <div >
         <li className={css.ImageGalleryItem} onClick={this.toggleModal}>
           <img className={css.ImageGalleryItemImage} src={webformatURL} alt={tags} />
         </li>

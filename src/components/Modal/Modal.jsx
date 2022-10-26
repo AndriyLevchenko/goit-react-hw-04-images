@@ -22,7 +22,7 @@ export class Modal extends React.Component {
   render () {
     const {largeImageURL, tags} = this.props;
     return (
-      <div className={css.Overlay}>
+      <div className={css.Overlay} onClick={this.onClose}>
         <div className={css.Modal}>
           <img src={largeImageURL} alt={tags} />
         </div>
