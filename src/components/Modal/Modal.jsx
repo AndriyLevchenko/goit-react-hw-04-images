@@ -34,4 +34,5 @@ export class Modal extends React.Component {
 Modal.propTypes = {
   largeImageURL: PropTypes.string.isRequired,
   tags: PropTypes.string.isRequired,
+  onClose: PropTypes.string.isRequired,
 }

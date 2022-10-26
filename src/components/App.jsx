@@ -1,10 +1,9 @@
 import React from 'react';
 import { Searchbar } from './Searchbar/Searchbar';
 import { ImageGallery } from './ImageGallery/ImageGallery';
-import { fetchPixabay } from './Pixabay/fetchPixabay';
+import { fetchPixabay } from './js/fetchPixabay';
 import { Button } from './Button/Button';
 import { LoaderSpiner } from './Loader/Loader';
-// import css from 'components/App.module.css';
 
 export class App extends React.Component {
   state = {
@@ -52,7 +51,6 @@ export class App extends React.Component {
         {status === 'pending' && <LoaderSpiner />}
         {hits.length > 0 && status === 'resolved' && page !== totalPages && (
         <Button onClick={this.loadMore} />)}
-        
       </div>
     )
   }
