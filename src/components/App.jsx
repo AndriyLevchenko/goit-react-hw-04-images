@@ -1,58 +1,53 @@
-import React from 'react';
+import {useState, useEffect} from 'react';
 import { Searchbar } from './Searchbar/Searchbar';
 import { ImageGallery } from './ImageGallery/ImageGallery';
 import { fetchPixabay } from './js/fetchPixabay';
 import { Button } from './Button/Button';
 import { LoaderSpiner } from './Loader/Loader';
 
-export class App extends React.Component {
-  state = {
-    page: 1,
-    totalPage: 1,
-    searchQueryInput: '',
-    hits: [],
-    status: 'idle',
-  }
-  componentDidUpdate = (prevProps, prevState) => {
-    const { searchQueryInput, page } = this.state;
-    if (prevState.searchQueryInput !== searchQueryInput || prevState.page !== page) {
-      this.setState({ status: 'pending' });
-    
-      fetchPixabay(searchQueryInput, page)
-      .then(res => {
-      const currentHits = res.data.hits.map(({ id, webformatURL, largeImageURL, tags }) => {
-        return { id, webformatURL, largeImageURL, tags};
+export const App = () => {
+  const [page, setPage] = useState(1);
+  const [totalPage, setTotalPage] = useState(1);
+  const [searchQueryInput, setSearchQueryInput] = useState('');
+  const [hits, setHits] = useState([]);
+  const [status, setStatus] = useState('idle');
+
+  useEffect (() => {
+      if (searchQueryInput && page) {
+        setStatus('pending');
+        fetchPixabay(searchQueryInput, page)
+        .then(res => {
+        const currentHits = res.data.hits.map(({ id, webformatURL, largeImageURL, tags }) => {
+          return { id, webformatURL, largeImageURL, tags};
+        });
+        setHits(prevState => [...prevState, ...currentHits])
+        setStatus('resolved')
+        setTotalPage(Math.ceil(res.data.totalHits / 12))
+        })
+      .catch(error => {
+        setStatus('rejected');
       });
-      this.setState(prevState => ({
-        hits: [...prevState.hits, ...currentHits],
-        status: 'resolved',
-        totalPages: Math.ceil(res.data.totalHits / 12),
-      }));
-    })
-    .catch(error => {
-      this.setState({ status: 'rejected' });
-    });
-  }}
+    }
+  }, [searchQueryInput, page]);
 
-  handleFormSubmit = query => {
-    this.setState({ searchQueryInput: query, page: 1, hits: [] });
+  const handleFormSubmit = query => {
+    setSearchQueryInput(query)
+    setPage(1)
+    setHits([])
   };
 
-  loadMore = () => {
-    this.setState(state => ({ page: state.page + 1 }));
+  const loadMore = () => {
+    setPage(state => state + 1);
   };
 
-  render() {
-    const {status, hits, page, totalPages} = this.state;
-    return (
-      <div>
-        <Searchbar onSubmit={this.handleFormSubmit}/>
-        {hits.length > 0 && <ImageGallery images={hits}/>}
-        {status === 'pending' && <LoaderSpiner />}
-        {hits.length > 0 && status === 'resolved' && page !== totalPages && (
-        <Button onClick={this.loadMore} />)}
-      </div>
-    )
-  }
+  return (
+    <div>
+      <Searchbar onSubmit={handleFormSubmit}/>
+      {hits.length > 0 && <ImageGallery images={hits}/>}
+      {status === 'pending' && <LoaderSpiner />}
+      {hits.length > 0 && status === 'resolved' && page !== totalPage && (
+      <Button onClick={loadMore} />)}
+    </div>
+  )
 }
 
